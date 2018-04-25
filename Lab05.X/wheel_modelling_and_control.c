@@ -486,19 +486,32 @@ int main(void) {
 
         // convert value read from pot [0-1023] to a speed [rad/sec]
 
-        update_array(Rout, Nr);
-        update_array(Rin, Nr);
-        Rin[0] = AD_value;
-        filter(A, B, Rin, Rout, Nr);
-        Rout[0] = max(0.0, Rout[0]);
-        Rout[0] = min(Rout[0], 1023);
-        R = Rout[0] * AD_scale;
-//        if (time < 0.5) R = 0.0;
-//        else if ((time >= 0.5) & (time < 5.5)) R = 10.0;
-//        else if ((time >= 5.5) & (time < 10.5)) R = 25.0;
-//        else if (time >= 10.5) R = 40.0;
-//        R = 75;
-        R = R * reference_scaling;
+//        update_array(Rout, Nr);
+//        update_array(Rin, Nr);
+//        Rin[0] = AD_value;
+//        filter(A, B, Rin, Rout, Nr);
+//        Rout[0] = max(0.0, Rout[0]);
+//        Rout[0] = min(Rout[0], 1023);
+//        R = Rout[0] * AD_scale;
+//        // reference signal 1
+//        R = 50.0;
+        
+//        // reference signal 2
+//        R = 75.0;
+        
+//        // reference signal 3
+//        if (time < 0.0) R = 0.0;
+//        else if ((time >= 0.0) & (time < 15.0)) R = 45.0;
+//        else if ((time >= 15.0) & (time < 30.0)) R = 60.0;
+//        else R = 0.0;
+        
+        // reference signal 4
+        if (time < 0.0) R = 0.0;
+        else if ((time >= 0.0) & (time < 10.0)) R = 40.0;
+        else if ((time >= 10.0) & (time < 20.0)) R = 55.0;
+        else if ((time >= 20.0) & (time < 30.0)) R = 70;
+        else R = 0.0;
+//        R = R * reference_scaling;
 
         /*********************************************/
         //  implement the FEEDBACK (H) functions
@@ -535,8 +548,8 @@ int main(void) {
         //
         /*********************************************/
 
-//        error = R; // use this for open loop control
-        error = R - Y;  // use this for closed loop control
+        error = R; // use this for open loop control
+//        error = R - Y;  // use this for closed loop control
 
         /*********************************************/
         //  implement the CONTROLLER (Gc) functions
@@ -549,12 +562,13 @@ int main(void) {
 //        error_in[0] = error;
 //        filter(Ac, Bc, error_in, u_out, Nu);
 //        u = u_out[0];
-        Derror = error-last_error;
-        last_error = error;
-        Isum = Isum + error;
-        Isum = max(0.0, Isum);
-        Isum = min(MAX_ISUM, Isum);
-        u = kp * error + ki * Isum + kd * Derror;
+//        Derror = error-last_error;
+//        last_error = error;
+//        Isum = Isum + error;
+//        Isum = max(0.0, Isum);
+//        Isum = min(MAX_ISUM, Isum);
+//        u = kp * error + ki * Isum + kd * Derror;
+        u = error;
 
         /*********************************************/
         // implement CONYTROl EFFORT CONVERSION
@@ -570,8 +584,6 @@ int main(void) {
         // so u has units of MAX_DUTY/1023 * [0-1023]
 
         u = u * convert_to_duty / AD_scale; // convert back to a pwm signal
-//        if (error > 0.0) u = 0.2 * MAX_DUTY;
-//        else u = 0.0;
         u = min(u, last_u+MAX_DELTA_U);
         u = min(u, MAX_DUTY);
         u = max(u,0.0);
@@ -597,7 +609,8 @@ int main(void) {
             int_Y = (int) 100*Y;
             int_u = (int) u;
 
-            printf("%8d %8d %8d %8d %8d\n", int_time, int_R, int_u, int_Y, (int) Isum);
+//            printf("%8d %8d %8d %8d %8d\n", int_time, int_R, int_u, int_Y, (int) Isum);
+            printf("%8d %8d %8d %8d\n", int_time, int_R, dutycycle, int_Y);
             count = MAX_COUNT;
         }   
         // save the current positions
