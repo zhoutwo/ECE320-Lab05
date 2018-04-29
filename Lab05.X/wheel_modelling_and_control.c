@@ -35,7 +35,7 @@
 #define MAX_COUNT 1
 #define PI 3.14159265
 #define MAXCNT 719  // maximum count for QEI encoders before interrupt, 720 counts per revolution
-#define MAX_ISUM 1476.7
+#define MAX_ISUM 2768.1
 
 // define some variables
 
@@ -378,11 +378,11 @@ int main(void) {
     double u_out[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
     int Nr = 5, Ny = 5, Nu = 5;
     double AD_scale = 0.1688;
-    double kp = 3.0530;
+    double kp = 3.3845;
     double reference_scaling = 1;
     double MAX_DELTA_U = 1000.0;
     double last_u = 0.0;
-    double ki = 0.0448, kd = 11.5436, Isum = 0;
+    double ki = 0.0548, kd = 12.2641, Isum = 0;
     double Derror = 0, last_error = 0;
 
     // set up the external interrupt
@@ -493,8 +493,8 @@ int main(void) {
 //        Rout[0] = max(0.0, Rout[0]);
 //        Rout[0] = min(Rout[0], 1023);
 //        R = Rout[0] * AD_scale;
-        // reference signal 1
-        R = 50.0;
+//        // reference signal 1
+//        R = 50.0;
         
 //        // reference signal 2
 //        R = 75.0;
@@ -505,12 +505,12 @@ int main(void) {
 //        else if ((time >= 15.0) & (time < 30.0)) R = 60.0;
 //        else R = 0.0;
         
-//        // reference signal 4
-//        if (time < 0.0) R = 0.0;
-//        else if ((time >= 0.0) & (time < 10.0)) R = 40.0;
-//        else if ((time >= 10.0) & (time < 20.0)) R = 55.0;
-//        else if ((time >= 20.0) & (time < 30.0)) R = 70;
-//        else R = 0.0;
+        // reference signal 4
+        if (time < 0.0) R = 0.0;
+        else if ((time >= 0.0) & (time < 10.0)) R = 40.0;
+        else if ((time >= 10.0) & (time < 20.0)) R = 55.0;
+        else if ((time >= 20.0) & (time < 30.0)) R = 70;
+        else R = 0.0;
         R = R * reference_scaling;
 
         /*********************************************/
